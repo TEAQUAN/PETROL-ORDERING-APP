@@ -1,6 +1,8 @@
 // controllers/stationController.js
 const PetrolStation = require('../models/PetrolStation');
 const axios = require('axios');
+const dotenv = require('dotenv');
+require('dotenv').config();
 
 exports.getAllStations = async (req, res) => {
   try {
@@ -93,7 +95,8 @@ exports.fetchAndSaveStations = async (req, res) => {
     }
 
     const radius = 3000 ; // Default radius (in meters)
-    const apiKey = 'AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI';
+    const apiKey = process.env.API_KEY;
+
 
     // Make request to Google Maps Places API to fetch gas stations
     const response = await axios.get(
@@ -210,7 +213,7 @@ exports.fetchAndSaveStations = async (req, res) => {
 //     }
 
 //     const radius = 5000; // Default radius (in meters)
-//     const apiKey = 'AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI'; // Replace with your Google Places API key
+//     const apiKey = ''; // Replace with your Google Places API key
 
 //     // Make request to Google Maps Places API
 //     const response = await axios.get(

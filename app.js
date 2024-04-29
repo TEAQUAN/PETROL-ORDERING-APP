@@ -10,6 +10,9 @@ const app = express();
 // Load environment variables from .env file
 dotenv.config();
 
+const apiKey = process.env.API_KEY;
+console.log(apiKey);
+
 // Middleware
 app.use(express.json());
 app.use(bodyParser.json());
