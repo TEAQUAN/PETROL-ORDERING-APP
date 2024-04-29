@@ -1,0 +1,5 @@
+Notes:
+This middleware uses the jsonwebtoken library to verify JSON Web Tokens (JWT).
+When a protected route uses this middleware, it expects a valid JWT token in the Authorization header of the HTTP request.
+The middleware verifies the token's validity and attaches the user object to the request for further processing in route handlers.
+If the token is invalid or missing, it sends a 401 Unauthorized response.

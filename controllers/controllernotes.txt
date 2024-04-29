@@ -1,0 +1,5 @@
+// Notes:
+// Each controller file (authController.js, stationController.js, etc.) defines functions to handle the logic for the corresponding routes.
+// These functions use the relevant Mongoose models (User, PetrolStation, FuelType, Order) to interact with the database.
+// The controller functions are placeholders and should be implemented with the required logic for your application, such as data retrieval, manipulation, validation, and sending responses.
+// You'll need to implement the specific logic inside each controller function based on your application's requirements. For example, the register function in authController.js would handle user registration by creating a new User document in the database, while getAllStations in stationController.js would fetch all petrol stations from the PetrolStation model.

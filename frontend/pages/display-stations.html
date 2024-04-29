@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Petrol Stations</title>
+</head>
+<body>
+    <h1>Petrol Stations</h1>
+
+    <div id="stationsContainer">
+        <!-- Display fetched stations data here -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Retrieve the stations data from the query parameter in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const stationsData = urlParams.get('stations');
+          
+            // Parse the stations data
+            const parsedStationsData = JSON.parse(decodeURIComponent(stationsData));
+          
+            // Display the stations data as needed
+            console.log('Fetched stations data:', parsedStationsData);
+            // Here you can dynamically generate HTML to display the stations data on the page
+            const stationsContainer = document.getElementById('stationsContainer');
+            if (parsedStationsData && parsedStationsData.length > 0) {
+                parsedStationsData.forEach(station => {
+                    const stationElement = document.createElement('div');
+                    stationElement.innerHTML = `<p>Name: ${station.name}</p><p>Address: ${station.formattedAddress}</p>`;
+                    stationsContainer.appendChild(stationElement);
+                });
+            } else {
+                const noStationsMessage = document.createElement('p');
+                noStationsMessage.textContent = 'No petrol stations found.';
+                stationsContainer.appendChild(noStationsMessage);
+            }
+        });
+    </script>
+</body>
+</html>

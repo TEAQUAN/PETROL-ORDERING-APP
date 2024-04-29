@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petrol Stations with 360 Street View</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI&callback=initMap" async defer></script>
+  <style>
+    /* Reset some default styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      padding-top: 70px; /* Adjusted for navbar height */
+    }
+
+    /* Navbar styles */
+    .navbar {
+      background-color: #007bff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 10px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .navbar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .nav-links {
+      display: flex;
+    }
+
+    .nav-link {
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 15px;
+      margin-left: 10px;
+      border-radius: 3px;
+      transition: background-color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background-color: #0056b3;
+    }
+
+    /* Style for the map container */
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    /* Style for the list of petrol stations */
+    .station-list {
+      margin-top: 20px;
+    }
+
+    .station {
+      border: 1px solid #007bff;
+      background-color: #fff;
+      color: #333;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .station:hover {
+      background-color: #f0f0f0;
+      transform: translateY(-5px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+        <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
+      <div class="nav-links">
+        <a href="./login.html" class="nav-link">Login</a>
+        <a href="./register.html" class="nav-link">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 style="margin-bottom: 20px;">Find Petrol Stations Near You</h1>
+    <div id="map"></div>
+    <div class="station-list" id="stationList">
+      
+      <!-- Add more stations as needed -->
+    </div>
+  </div>
+
+  <!-- Include your JavaScript file at the end -->
+  <script src="./JS/stations.js"></script>
+</body>
+</html>
