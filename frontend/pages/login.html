@@ -51,7 +51,7 @@
 
     <script src="script.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+       document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById('loginForm');
 
     loginForm.addEventListener('submit', async (event) => {
@@ -73,9 +73,13 @@
             if (!response.ok) {
                 throw new Error('Login failed');
             }
-
+            console.log(response)
+            // Parse response body as JSON
+            const data = await response.json();
+            // Store token in localStorage
+            localStorage.setItem('token', data.token);
             // Redirect to another page upon successful login
-            window.location.href = '/dashboard.html'; // Change 'dashboard.html' to your desired page
+            window.location.href = 'stations.html';
 
         } catch (error) {
             console.error('Error:', error.message);
@@ -83,6 +87,7 @@
         }
     });
 });
+
 
     </script>
 </body>

@@ -303,26 +303,29 @@
             },
             body: JSON.stringify(formData)
         })
+        
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Registration failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);
-            if (response.ok) {
-                window.location.href = 'login.html';
-            } else {
-                throw new Error('Registration failed. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Registration failed. Please try again.');
+                    if (!response.ok) {
+                        throw new Error('Registration failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    // Check if the response was successful
+                    if (data.success) {
+                        window.location.href = 'login.html';
+                    } else {
+                        alert(data.message); // Display the error message
+                        throw new Error('Registration failed. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Registration failed. Please try again.');
+                });
+            });
         });
-    });
-});
 
 function togglePassword(inputId) {
     const passwordInput = document.getElementById(inputId);

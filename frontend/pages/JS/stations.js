@@ -7,7 +7,13 @@ function initMap() {
   
     async function fetchStations() {
       try {
-        const response = await fetch('http://localhost:3000/GetStations/allStations');
+        const response = await fetch('http://localhost:3000/GetStations/allStations', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjM4Y2Q0NzQxNzViOWIzMjJhZWI1YzAiLCJpYXQiOjE3MTUwNzg4NjksImV4cCI6MTcxNTA4MjQ2OX0.4wZD0gYDz1Kfs-eeO6w48A42cfX1RWiURZwDbYhqau4`,
+          },
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch stations');
         }
