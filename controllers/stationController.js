@@ -180,24 +180,6 @@ exports.fetchAndSaveStations = async (req, res) => {
   }
 };
 
-
-// Function to calculate distance between two coordinates using Haversine formula
-// function calculateDistance(lat1, lon1, lat2, lon2) {
-//   const R = 6371; // Radius of the Earth in km
-//   const dLat = deg2rad(lat2 - lat1);
-//   const dLon = deg2rad(lon2 - lon1);
-//   const a =
-//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//     Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//   const distance = R * c; // Distance in km
-//   return distance;
-// }
-
-// function deg2rad(deg) {
-//   return deg * (Math.PI / 180);
-// }
-
 // exports.fetchAndSaveStations = async (req, res) => {
 //   try {
 //     const { latitude, longitude } = req.query;
@@ -259,63 +241,4 @@ exports.fetchAndSaveStations = async (req, res) => {
 // };latest one
 
 
-// exports.fetchAndSaveStations = async (req, res) => {
-//   try {
-//     const { latitude, longitude } = req.query;
 
-//     // Validate latitude and longitude
-//     if (! (latitude || longitude)) {
-//       return res.status(400).json({ error: 'Latitude and longitude are required.' });
-//     }
-
-//     // Check if latitude and longitude are valid numbers
-//     if (isNaN(latitude || longitude)) {
-//       return res.status(400).json({ error: 'Latitude and longitude must be valid numbers.' });
-//     }
-
-//     const radius = 5000; // Default radius (in meters)
-//     const apiKey = 'AIzaSyCd_tBmEQlkhk_iXJgjos9_Q6V2m9COuXM';
-    
-
-//     // Make request to Google Maps Places API
-//     const response = await axios.get(
-//       `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=gas_station&key=${apiKey}`
-//     );
-
-//     // Check if API request was successful
-//     if (response.status !== 200 || response.data.status !== 'OK') {
-//       throw new Error('Error fetching data from Google Places API.');
-//     }
-
-//     // Process API response and update or insert into the database
-//     const petrolStations = response.data.results.map(result => {
-//       return {
-//         name: result.name,
-//         address: result.vicinity, // Address of the petrol station
-//         location: {
-//           type: "Point",
-//           coordinates: [result.geometry.location.lng, result.geometry.location.lat],
-//         },
-//         services: [], // Add services if available
-//         ratings: result.rating || 0,
-//       };
-//     });
-
-//     // Update or Insert petrol stations to MongoDB
-//     const bulkOps = petrolStations.map(station => ({
-//       updateOne: {
-//         filter: { name: station.name },
-//         update: { $set: station },
-//         upsert: true // If station doesn't exist, insert it
-//       }
-//     }));
-
-//     // Perform bulk write operation for efficient updates/inserts
-//     const bulkResult = await PetrolStation.bulkWrite(bulkOps);
-
-//     res.json({ message: 'Stations fetched and updated.', result: bulkResult });
-//   } catch (error) {
-//     console.error('Error fetching and saving stations:', error);
-//     res.status(500).json({ error: 'Error fetching and saving stations.' });
-//   }
-// };

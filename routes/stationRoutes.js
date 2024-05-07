@@ -2,9 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const stationController = require('../controllers/stationController');
+const authMiddleware = require("../middleware/authMiddleware")
 
 // Get all stations
-router.get('/stations', stationController.getAllStations);
+router.get('/stations',  stationController.getAllStations);
 
 // Get station by ID
 router.get('/stations/:id', stationController.getStationById);
