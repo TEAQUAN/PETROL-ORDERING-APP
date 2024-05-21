@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POA - Petrol Station</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Notification styles */
+        .notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2196F3; /* Blue color */
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .notification.show {
+            display: block;
+        }
+        .locational-icon {
+    font-size: 24px; /* Adjust size as needed */
+    transition: transform 0.3s ease-in-out;
+}
+
+.locational-icon:hover,
+.locational-icon.clicked {
+    transform: scale(1.2);
+}
+
+    </style>
 </head>
 <body>
 
@@ -24,22 +52,83 @@
         <div class="container">
             <h1>Welcome to POA - Your Petrol Station</h1>
             <p>Find the nearest petrol stations, compare fuel prices, and more.</p>
-            <a href="./pages/stations.html" class="btn"> Petrol Stations Near you </a>
-            <button class="btn" id="fetchStationsButton">Click button to get petrol stations near you</button>
-            <!-- <a id="fetchStationsButton">Fetch Petrol Stations </a> -->
+            <button id="fetchStationsButton" class="btn locational-icon">Click to give us your location📍</button>
+                <br>
+                <br>
+                <p>Then click below to see petrol stations</p>
+                <br>
+                <button id="stationsNearYouButton" class="btn">Petrol Stations Near you</button>
         </div>
     </div>
 
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        You are not logged in or registered.
+    </div>
+
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 POA - Petrol Station. All rights reserved.</p>
-        </div>
-    </footer>
+
 
     <script src="script.js"></script>
+
+    
+   <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const notification = document.getElementById('notification');
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                try {
+                    // Decode the JWT token to get the user role
+                    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                    const userRole = decodedToken.roles[0].toLowerCase();  // Convert role to lowercase
+
+                    // Redirect based on the user role
+                    if (userRole === 'admin') {
+                        window.location.href = './pages/Adminpage.html';
+                    } else {
+                        window.location.href = './pages/stations.html';
+                    }
+                } catch (error) {
+                    console.error('Error decoding token:', error);
+                    // Clear the token and redirect to login page if there's an error
+                    localStorage.removeItem('token');
+                    window.location.href = './pages/login.html';
+                }
+            }
+
+            const stationsNearYouButton = document.getElementById('stationsNearYouButton');
+            stationsNearYouButton.addEventListener('click', () => {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    // Show notification if token is not found
+                    notification.classList.add('show');
+                    setTimeout(() => {
+                        // Redirect to login page after 3 seconds
+                        window.location.href = './pages/login.html';
+                    }, 3000);
+                } else {
+                    try {
+                        // Decode the JWT token to get the user role
+                        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                        const userRole = decodedToken.roles[0].toLowerCase();  // Convert role to lowercase
+
+                        // Redirect based on the user role
+                        if (userRole === 'admin') {
+                            window.location.href = './pages/admin.html';
+                        } else {
+                            window.location.href = './pages/stations.html';
+                        }
+                    } catch (error) {
+                        console.error('Error decoding token:', error);
+                        // Clear the token and redirect to login page if there's an error
+                        localStorage.removeItem('token');
+                        window.location.href = './pages/login.html';
+                    }
+                }
+            });
+        });
+    </script> 
     
 </body>
 </html>
-
-

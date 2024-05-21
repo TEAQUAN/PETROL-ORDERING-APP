@@ -133,6 +133,8 @@ exports.fetchAndSaveStations = async (req, res) => {
 
         const streetViewUrl = streetViewResponse.request.res.responseUrl; // Get the Street View image URL
 
+        const img = '';
+
         return {
           name: placeDetails.name,
           latitude: result.geometry.location.lat,
@@ -140,9 +142,11 @@ exports.fetchAndSaveStations = async (req, res) => {
           formattedAddress: placeDetails.formatted_address,
           ratings: placeDetails.rating || 0,
           address: placeDetails.formatted_address,
-          latestFuelPrice: 0, // You can set this to a default value or fetch from another source
+          latestFuelPrice: 0,
+          latestDieselPrice: 0, 
           photoReference: photoReference, // Store the photo reference
-          streetViewUrl: streetViewUrl // Store the Street View image URL
+          streetViewUrl: streetViewUrl, // Store the Street View image URL
+          img: img, // Store the img field
         };
       })
     );

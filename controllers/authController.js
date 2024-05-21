@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
   try {
-    const { username, email, phone, password, confirmPassword } = req.body;
+    const { username, email, phone, password, confirmPassword,roles  } = req.body;
 
     // Check if passwords match
     if (password !== confirmPassword) {
@@ -25,6 +25,7 @@ exports.register = async (req, res) => {
       email,
       phone,
       password, // Note: Password should be hashed before storing
+      roles: roles || ['user']
     });
 
     await newUser.save();
@@ -58,9 +59,14 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
 
+   
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log(token)
+    const token = jwt.sign(
+      { userId: user._id, roles: user.roles },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    console.log(token);
 
     res.json({ success: true, message: 'Login successful', token });
   } catch (error) {

@@ -25,7 +25,7 @@
     <div class="login-container">
         <div class="container">
             <h2>Login to Your Account</h2>
-            <form id="loginForm"  class="login-form">
+            <form id="loginForm" class="login-form">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="Enter your email" required>
@@ -49,46 +49,56 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
     <script>
-       document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById('loginForm');
+        document.addEventListener("DOMContentLoaded", () => {
+            const loginForm = document.getElementById('loginForm');
 
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent default form submission
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form submission
 
-        const formData = new FormData(loginForm);
-        const email = formData.get('email');
-        const password = formData.get('password');
+                const formData = new FormData(loginForm);
+                const email = formData.get('email');
+                const password = formData.get('password');
 
-        try {
-            const response = await fetch('http://localhost:3000/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
+                try {
+                    const response = await fetch('http://localhost:3000/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                            
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Login failed');
+                    }
+
+                    // Parse response body as JSON
+                    const data = await response.json();
+                    
+                    // Store token in localStorage
+                    localStorage.setItem('token', data.token);
+
+                    // Decode the JWT token to get the user role
+                    const decodedToken = JSON.parse(atob(data.token.split('.')[1]));
+                    const userRole = decodedToken.roles[0].toLowerCase();  // Convert role to lowercase
+
+                    // Store role in localStorage (optional)
+                    localStorage.setItem('role', userRole);
+
+                    // Redirect based on role
+                    if (userRole === 'admin') {
+                        window.location.href = 'Adminpage.html';
+                    } else {
+                        window.location.href = 'stations.html';
+                    }
+                } catch (error) {
+                    console.error('Error:', error.message);
+                    // Handle login failure, show error message, etc.
+                }
             });
-
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-            console.log(response)
-            // Parse response body as JSON
-            const data = await response.json();
-            // Store token in localStorage
-            localStorage.setItem('token', data.token);
-            // Redirect to another page upon successful login
-            window.location.href = 'stations.html';
-
-        } catch (error) {
-            console.error('Error:', error.message);
-            // Handle login failure, show error message, etc.
-        }
-    });
-});
-
-
+        });
     </script>
 </body>
 </html>

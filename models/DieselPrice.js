@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const petrolStation = require("./PetrolStation")
 
-const fuelPriceSchema = new mongoose.Schema({
+const DieselPriceSchema = new mongoose.Schema({
   petrolStation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PetrolStations',
@@ -9,7 +9,7 @@ const fuelPriceSchema = new mongoose.Schema({
   },
   fuelType: {
     type: String,
-    enum: ['Petrol', 'Diesel', 'Premium', 'LPG'], // Example fuel types
+    enum: [ 'Diesel'],
     required: true,
   },
   price: {
@@ -27,6 +27,6 @@ const fuelPriceSchema = new mongoose.Schema({
   },
 });
 
-const FuelPrice = mongoose.model('FuelPrice', fuelPriceSchema);
+const DieselPrice = mongoose.model('DieselPrice',DieselPriceSchema );
 
-module.exports = FuelPrice;
+module.exports = DieselPrice;

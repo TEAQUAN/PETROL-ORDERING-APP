@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler'); 
+const path = require('path');
 const app = express();
 
 
@@ -17,6 +18,7 @@ console.log(apiKey);
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database connection
 const db = require('./config/db');
@@ -33,23 +35,19 @@ const stationRoutes = require('./routes/stationRoutes');
 const fuelRoutes = require('./routes/fuelRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const profileRoutes = require('./routes/profileRoutes');
-const fuelTypeRoutes = require("./routes/fuelTypeRoutes");
 const fetchStations = require("./routes/fetch-stations")
-const fuelPriceRoute = require("./routes/fuelPriceRoute")
+const AdminRoute = require("./routes/AdminRoute")
 
 app.use('/auth', authRoutes);
 app.use('/stations', stationRoutes);
 app.use('/fuels', fuelRoutes);
 app.use('/orders', orderRoutes);
 app.use('/profile', profileRoutes);
-app.use('/fuelType', fuelTypeRoutes);
+app.use('/Admin', AdminRoute);
 app.use("/GetStations",fetchStations)
-app.use("/fuel",fuelPriceRoute)
 app.use(errorHandler)
 
 // Start the server
-const stations = ["Rainoil", "Conoil", "Eterna", "Total"]
-console.log(`Server started on port `, stations.includes("Rainoil"))
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

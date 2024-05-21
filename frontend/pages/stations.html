@@ -1,20 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Petrol Stations with 360 Street View</title>
-  <!-- <script type="text/javascript">
-
-    setInterval(function(){
-
-      if(!localStorage.getItem('token')){
-        window.location.href = 'login.html';
-      }
-      console.log("Timer Ticked!")
-    }, 5000)
-  </script> -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI&callback=initMap" async defer></script>
   <style>
     /* Reset some default styles */
@@ -112,10 +101,10 @@
 <body>
   <nav class="navbar">
     <div class="container">
-        <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
+      <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
       <div class="nav-links">
-        <a href="./login.html" class="nav-link">Login</a>
-        <a href="./register.html" class="nav-link">Register</a>
+        <!-- Replace "#" with actual logout action if needed -->
+        <a href="#" id="logoutButton" class="nav-link" style="display: none;">Logout</a>
       </div>
     </div>
   </nav>
@@ -131,5 +120,59 @@
 
   <!-- Include your JavaScript file at the end -->
   <script src="./JS/stations.js"></script>
+  <script>
+    // Function to update navbar based on token presence
+    function updateNavbar() {
+      const token = localStorage.getItem('token');
+      const logoutButton = document.getElementById('logoutButton');
+
+      if (token) {
+        // User is logged in
+        logoutButton.style.display = 'block'; // Show logout button
+      } else {
+        // User is not logged in
+        logoutButton.style.display = 'none'; // Hide logout button
+      }
+    }
+
+    // Function to initialize the page
+    function initPage() {
+      // Update navbar on page load
+      updateNavbar();
+
+      // Add event listener to logout button
+      const logoutButton = document.getElementById('logoutButton');
+      logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('token'); // Remove token from localStorage
+        updateNavbar(); // Update navbar after logout
+        // Redirect to login page
+        window.location.href = './login.html'; // Adjust the URL as needed
+      });
+    }
+
+    // Call initPage function when the page is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage();
+    });
+  </script>
+
+<script>
+  // Function to update navbar based on token presence
+  // Your existing JavaScript code here
+
+  // Function to check token and redirect to login if not present
+  function checkTokenAndRedirect() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = './login.html'; // Redirect to login page
+    }
+  }
+
+  // Call checkTokenAndRedirect function when the page is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Your existing code here
+    checkTokenAndRedirect();
+  });
+</script>
 </body>
 </html>
