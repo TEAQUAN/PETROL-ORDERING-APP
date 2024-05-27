@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const fetchStationsButton = document.getElementById('fetchStationsButton');
-  const mapDiv = document.getElementById('map');
+  const notification = document.getElementById('notification');
 
   fetchStationsButton.addEventListener('click', async () => {
     try {
@@ -8,7 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const latitude = coords.latitude;
       const longitude = coords.longitude;
+      console.log(latitude, longitude);
       const radius = 5000; // Default radius (in meters)
+
+      // Show notification
+      notification.textContent = 'Fetching petrol stations...';
+      notification.classList.add('show');
 
       // Send request to backend API to populate the database
       const apiUrl = `http://localhost:3000/GetStations/fetch?latitude=${latitude}&longitude=${longitude}&radius=${radius}`;
@@ -20,19 +25,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Display Image of Location
       const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=13&size=400x300&maptype=roadmap&markers=color:red%7C${latitude},${longitude}&key=AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI`;
-      
-  
-
-      
-
       console.log('Stations fetched and database updated');
       console.log('Map Image URL:', mapUrl);
 
-    
+      // After successful fetch, hide notification
+      notification.textContent = 'Petrol stations fetched successfully.';
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
 
     } catch (error) {
       console.error('Error:', error.message);
-      // Handle errors, show error message to user, etc.
+      notification.textContent = 'Error fetching petrol stations.';
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
     }
   });
 

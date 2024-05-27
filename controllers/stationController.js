@@ -117,6 +117,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 exports.fetchAndSaveStations = async (req, res) => {
   try {
     const { latitude, longitude } = req.query;
+    console.log('Latitude:', latitude);
+    console.log('Longitude:', longitude);
 
     // Validate latitude and longitude
     if (!latitude || !longitude) {
@@ -181,6 +183,7 @@ exports.fetchAndSaveStations = async (req, res) => {
           photoReference: photoReference, // Store the photo reference
           streetViewUrl: streetViewUrl, // Store the Street View image URL
           img: img, // Store the img field
+          availability: true, // Defaulting availability to true
         };
       })
     );

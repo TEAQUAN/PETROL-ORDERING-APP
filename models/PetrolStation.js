@@ -35,6 +35,10 @@ const petrolStationSchema = new mongoose.Schema({
   photoReference: String, // New field for photo reference
   streetViewUrl: String, // New field for Street View image URL
   img: String, // Field for image filename
+  availability: {
+    type: Boolean,
+    default: true,
+  }
 });
 
 // Create a virtual field for 'location'

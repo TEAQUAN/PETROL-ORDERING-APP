@@ -79,6 +79,7 @@
   <div class="navbar">
     <a href="../Home.html">HOME POA</a>
     <a href="./ImageUploadPage.html">Upload Image</a>
+    <button id="logoutButton">LOGOUT</button>
   </div>
 
   <div class="container">
@@ -105,7 +106,35 @@
   </div>
 
   <script>
+    // Function to check token and redirect to login if not present or expired
+    function checkTokenAndRedirect() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = './login.html'; // Redirect to login page
+        return;
+      }
+
+      try {
+        // Decode the token to get the payload
+        const payload = JSON.parse(atob(token.split('.')[1]));
+
+        // Get the current time in seconds since epoch
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Check if the token is expired
+        if (payload.exp < currentTime) {
+          window.location.href = './login.html'; // Redirect to login page
+        }
+      } catch (error) {
+        // Handle error (invalid token format, etc.)
+        console.error('Error decoding token:', error);
+        window.location.href = './login.html'; // Redirect to login page
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
+      checkTokenAndRedirect(); // Check token on page load
+
       const fuelPriceForm = document.getElementById('fuelPriceForm');
       const message = document.getElementById('message');
       const petrolStationDropdown = document.getElementById('petrolStationName');
@@ -120,9 +149,9 @@
             'authorization': 'Bearer ' + localStorage.getItem('token')
           }
         });
-        
+
         if (!response.ok) throw new Error('Failed to fetch petrol stations');
-        
+
         const petrolStations = await response.json();
         petrolStations.forEach(station => {
           const option = document.createElement('option');
@@ -168,6 +197,13 @@
         }
       });
     });
+  </script>
+  <script>
+      const logOutButton = document.getElementById("logoutButton")
+      logOutButton.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        window.location.href = "./login.html";
+      })
   </script>
 </body>
 </html>

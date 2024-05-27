@@ -104,7 +104,8 @@
             <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
             <div class="nav-links">
                 <!-- Replace "#" with actual logout action if needed -->
-                <a href="#" id="logoutButton" class="nav-link" style="display: none;">Logout</a>
+                <!-- <a href="#">Logout</a> -->
+                <button  id="logoutButton">Logout</button>
             </div>
         </div>
     </nav>
@@ -248,8 +249,9 @@
             function createStationElement(station) {
                 const stationDiv = document.createElement('div');
                 stationDiv.classList.add('station');
-
+                const imagePath = station.img.replace(/\\/g, '/');
                 stationDiv.innerHTML = `
+                <img src="http://localhost:3000/${imagePath}" alt="Station Image" style="max-width: 60%; height: 30;">
                     <h3>${station.name}</h3>
                     <p>Address: ${station.address}</p>
                     <p>Distance: ${station.distance !== 'N/A' ? station.distance.toFixed(2) : 'N/A'} km</p>
@@ -257,7 +259,8 @@
                     <p>Ratings: ${station.ratings}</p>
                     <p>Fuel Price (Latest): ${station.latestFuelPrice}</p>
                     <p>Diesel Price (Latest): ${station.latestDieselPrice}</p>
-                    <img src="${station.img}" alt="Station Image" style="max-width: 100%; height: auto;">
+                    <p>Availability:${station.availability} </p>
+                    
                 `;
 
                 stationDiv.addEventListener('click', () => {
@@ -283,15 +286,6 @@
             // Function to update navbar based on token presence
             function updateNavbar() {
                 const token = localStorage.getItem('token');
-                const logoutButton = document.getElementById('logoutButton');
-
-                if (token) {
-                    // User is logged in
-                    logoutButton.style.display = 'block'; // Show logout button
-                } else {
-                    // User is not logged in
-                    logoutButton.style.display = 'none'; // Hide logout button
-                }
             }
 
             // Function to initialize the page
@@ -299,14 +293,6 @@
                 // Update navbar on page load
                 updateNavbar();
 
-                // Add event listener to logout button
-                const logoutButton = document.getElementById('logoutButton');
-                logoutButton.addEventListener('click', () => {
-                    localStorage.removeItem('token'); // Remove token from localStorage
-                    updateNavbar(); // Update navbar after logout
-                    // Redirect to login page
-                    window.location.href = './login.html'; // Adjust the URL as needed
-                });
             }
 
             // Call initPage function when the page is loaded
@@ -320,10 +306,31 @@
                 initPage();
             });
 
-            // Function to check token and redirect to login if not present
+            // Function to check token and redirect to login if not present or expired
             function checkTokenAndRedirect() {
                 const token = localStorage.getItem('token');
                 if (!token) {
+                    window.location.href = './login.html'; // Redirect to login page
+                    return;
+                }
+
+                try {
+                    // Decode the token to get the payload
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    console.log(payload.exp)
+
+                    // Get the current time in seconds since epoch
+                    const currentTime = Math.floor(Date.now() / 1000);
+
+                    // Check if the token is expired
+                    if (payload.exp < currentTime) {
+                        localStorage.removeItem('token'); // Remove expired token
+                        window.location.href = './login.html'; // Redirect to login page
+                    }
+                } catch (error) {
+                    // Handle error (invalid token format, etc.)
+                    console.error('Error decoding token:', error);
+                    localStorage.removeItem('token'); // Remove invalid token
                     window.location.href = './login.html'; // Redirect to login page
                 }
             }
@@ -331,8 +338,16 @@
             // Call checkTokenAndRedirect function when the page is loaded
             document.addEventListener('DOMContentLoaded', () => {
                 checkTokenAndRedirect();
+                setInterval(checkTokenAndRedirect, 30000); // Check every 2 minutes
             });
         }
+    </script>
+      <script>
+        const logOutButton = document.getElementById("logoutButton")
+        logOutButton.addEventListener("click", () => {
+          localStorage.removeItem("token");
+          window.location.href = "./login.html";
+        })
     </script>
 </body>
 </html>

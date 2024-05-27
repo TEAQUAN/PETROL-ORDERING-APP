@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding-top: 70px; /* Adjusted for navbar height */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .order-details {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-details h2 {
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
+            <div class="nav-links">
+                <button id="logoutButton">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="order-details">
+            <h2>Order Details</h2>
+            <p>You are placing an order at:</p>
+            <p id="stationDetails"></p>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="name">Your Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Your Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Your Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="fuelType">Fuel Type:</label>
+                    <select id="fuelType" name="fuelType" required>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity (in liters):</label>
+                    <input type="number" id="quantity" name="quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Info:</label>
+                    <textarea id="additionalInfo" name="additionalInfo" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const stationDetails = document.getElementById('stationDetails');
+            const orderForm = document.getElementById('orderForm');
+
+            // Retrieve selected station from localStorage
+            const selectedStation = JSON.parse(localStorage.getItem('selectedStation'));
+            if (!selectedStation) {
+                // If no station is selected, redirect to the main page
+                window.location.href = './index.html';
+            }
+
+            // Display selected station details
+            stationDetails.innerHTML = `
+                <strong>${selectedStation.name}</strong><br>
+                Address: ${selectedStation.address}<br>
+                Fuel Price: ${selectedStation.latestFuelPrice}<br>
+                Diesel Price: ${selectedStation.latestDieselPrice}
+            `;
+
+            // Handle form submission
+            orderForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(orderForm);
+                const orderDetails = {
+                    stationId: selectedStation._id,
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    fuelType: formData.get('fuelType'),
+                    quantity: formData.get('quantity'),
+                    additionalInfo: formData.get('additionalInfo'),
+                };
+
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('http://localhost:3000/orders/placeOrder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify(orderDetails),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to place order');
+                    }
+
+                    const data = await response.json();
+                    console.log('Order placed successfully:', data);
+                    alert('Order placed successfully!');
+                    window.location.href = './index.html'; // Redirect to main page
+                } catch (error) {
+                    console.error('Error placing order:', error);
+                    alert('Failed to place order. Please try again later.');
+                }
+            });
+
+            // Function to update navbar based on token presence
+            function updateNavbar() {
+                const token = localStorage.getItem('token');
+            }
+
+            // Function to initialize the page
+            function initPage() {
+                // Update navbar on page load
+                updateNavbar();
+            }
+
+            // Call initPage function when the page is loaded
+            initPage();
+
+            const logOutButton = document.getElementById("logoutButton");
+            logOutButton.addEventListener("click", () => {
+                localStorage.removeItem("token");
+                window.location.href = "./login.html";
+            });
+        });
+    </script>
+</body>
+</html>

@@ -18,8 +18,8 @@ console.log(apiKey);
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static('uploads'));
 // Database connection
 const db = require('./config/db');
 mongoose.connect(db.mongoURI, {
