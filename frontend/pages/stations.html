@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petrol Stations with 360 Street View</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI&libraries=geometry,places&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB5PKwLpSTwkzJhxwdxfv885mAQ3BZYfI&libraries=geometry,places&callback=initMap"
+        async defer></script>
     <style>
         /* Reset some default styles */
         * {
@@ -14,26 +16,27 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9fafc;
             color: #333;
-            padding-top: 70px; /* Adjusted for navbar height */
+            padding-top: 70px;
         }
 
         /* Navbar styles */
         .navbar {
-            background-color: #007bff;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 1000;
             padding: 10px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -45,16 +48,18 @@
         }
 
         .logo {
-            color: #fff;
+            color: #333;
             font-size: 24px;
+            font-weight: bold;
         }
 
         .nav-links {
             display: flex;
+            align-items: center;
         }
 
         .nav-link {
-            color: #fff;
+            color: #333;
             text-decoration: none;
             padding: 8px 15px;
             margin-left: 10px;
@@ -63,7 +68,15 @@
         }
 
         .nav-link:hover {
-            background-color: #0056b3;
+            background-color: #f0f0f0;
+        }
+
+        .nav-link button {
+            background: none;
+            border: none;
+            font: inherit;
+            cursor: pointer;
+            color: #333;
         }
 
         /* Style for the map container */
@@ -78,34 +91,71 @@
         /* Style for the list of petrol stations */
         .station-list {
             margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .station {
-            border: 1px solid #007bff;
+            border: 1px solid #e0e0e0;
             background-color: #fff;
             color: #333;
             padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .station img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .station h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .station p {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .station button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .station button:hover {
+            background-color: #0056b3;
         }
 
         .station:hover {
-            background-color: #f0f0f0;
             transform: translateY(-5px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
-            <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
+            <h1 class="logo"><a href="../Home.html" class="nav-link">POA</a></h1>
             <div class="nav-links">
-                <!-- Replace "#" with actual logout action if needed -->
-                <!-- <a href="#">Logout</a> -->
-                <button  id="logoutButton">Logout</button>
+                <button id="logoutButton">Logout</button>
             </div>
         </div>
     </nav>
@@ -230,7 +280,7 @@
                             destinations: destinationChunks[chunkIndex],
                             travelMode: 'DRIVING',
                             unitSystem: google.maps.UnitSystem.METRIC,
-                        }, 
+                        },
                         (response, status) => {
                             if (status !== 'OK') {
                                 console.error('Error with Distance Matrix:', status);
@@ -251,7 +301,7 @@
                 stationDiv.classList.add('station');
                 const imagePath = station.img.replace(/\\/g, '/');
                 stationDiv.innerHTML = `
-                <img src="http://localhost:3000/${imagePath}" alt="Station Image" style="max-width: 60%; height: 30;">
+                    <img src="http://localhost:3000/${imagePath}" alt="Station Image">
                     <h3>${station.name}</h3>
                     <p>Address: ${station.address}</p>
                     <p>Distance: ${station.distance !== 'N/A' ? station.distance.toFixed(2) : 'N/A'} km</p>
@@ -259,8 +309,8 @@
                     <p>Ratings: ${station.ratings}</p>
                     <p>Fuel Price (Latest): ${station.latestFuelPrice}</p>
                     <p>Diesel Price (Latest): ${station.latestDieselPrice}</p>
-                    <p>Availability:${station.availability} </p>
-                    
+                    <p>Availability: ${station.availability}</p>
+                    <button type="button">Buy</button>
                 `;
 
                 stationDiv.addEventListener('click', () => {
@@ -292,7 +342,6 @@
             function initPage() {
                 // Update navbar on page load
                 updateNavbar();
-
             }
 
             // Call initPage function when the page is loaded
@@ -342,12 +391,13 @@
             });
         }
     </script>
-      <script>
+    <script>
         const logOutButton = document.getElementById("logoutButton")
         logOutButton.addEventListener("click", () => {
-          localStorage.removeItem("token");
-          window.location.href = "./login.html";
+            localStorage.removeItem("token");
+            window.location.href = "./login.html";
         })
     </script>
 </body>
+
 </html>
