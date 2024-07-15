@@ -17,6 +17,7 @@ console.log(apiKey);
 // Middleware
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(express.static("frontend"))
 app.use(cors());
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static('uploads'));
@@ -45,6 +46,11 @@ app.use('/orders', orderRoutes);
 app.use('/profile', profileRoutes);
 app.use('/Admin', AdminRoute);
 app.use("/GetStations",fetchStations)
+
+app.use("*", (req, res) =>{
+  res.sendFile(path.resolve("frontend/Home.html"))
+})
+
 app.use(errorHandler)
 
 // Start the server

@@ -108,11 +108,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow: hidden;
+            text-align: center;
         }
 
         .station img {
-            width: 50%;
-            height: auto;
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
             border-radius: 10px;
             margin-bottom: 10px;
         }
@@ -147,49 +150,96 @@
             transform: translateY(-5px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        #logoutButton {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
 
-#logoutButton:hover {
-    background-color: #c82333;
-}
+        #logoutButton {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #logoutButton:hover {
+            background-color: #c82333;
+        }
+
+        /* Pagination styles */
+        .pagination-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pagination-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .pagination-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination-container span {
+            font-size: 18px;
+            margin: 0 10px;
+        }
     </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
     <nav class="navbar">
+        
         <div class="container">
             <h1 class="logo"><a href="../Home.html" class="nav-link">POA</a></h1>
             <div class="nav-links">
-                <button id="logoutButton">Logout</button>
+                <button id="logoutButton">Logout</button> 
+                <a href="cart.html"><i class="fa fa-shopping-cart">Cart</i></a>
+                
             </div>
         </div>
+       
     </nav>
 
     <div class="container">
         <h1 style="margin-bottom: 20px;">Find Petrol Stations Near You</h1>
         <div id="map"></div>
+        <BR></BR>
+        <h1>Click any from below to purchase</h1>
         <div class="station-list" id="stationList"></div>
+        <div class="pagination-container">
+            <button id="prevPage">Previous Page</button>
+            <span id="currentPage">Page 1</span>
+            <button id="nextPage">Next Page</button>
+        </div>
     </div>
 
     <script>
+        let userLat;
+        let userLng;
+
         function initMap() {
             const stationListDiv = document.getElementById('stationList');
             const mapDiv = document.getElementById('map');
             let map;
+            let stations = []; // To store all stations data
+            let currentPage = 1;
+            const stationsPerPage = 6; // Number of stations per page
 
             // Get the user's current location
             navigator.geolocation.getCurrentPosition(
                 position => {
-                    const userLat = position.coords.latitude;
-                    const userLng = position.coords.longitude;
+                    userLat = position.coords.latitude;
+                    userLng = position.coords.longitude;
 
                     fetchStations(userLat, userLng);
                 },
@@ -218,58 +268,57 @@
 
                     const data = await response.json();
                     console.log('Fetched stations:', data);
-                    displayStations(data, userLat, userLng);
+                    stations = data;
+                    displayStations(currentPage);
                 } catch (error) {
                     console.error('Error fetching stations:', error);
                     alert('Failed to fetch stations. Please try again later.');
                 }
             }
 
-            function displayStations(stations, userLat, userLng) {
-                const center = stations.length ? { lat: stations[0].latitude, lng: stations[0].longitude } : { lat: 40.712776, lng: -74.005974 };
+            function displayStations(page) {
+                const startIndex = (page - 1) * stationsPerPage;
+                const endIndex = startIndex + stationsPerPage;
+                const currentStations = stations.slice(startIndex, endIndex);
+
+                const center = currentStations.length ? { lat: currentStations[0].latitude, lng: currentStations[0].longitude } : { lat: 40.712776, lng: -74.005974 };
                 map = new google.maps.Map(mapDiv, {
                     center: center,
                     zoom: 12,
                 });
 
-                const destinations = stations.map(station => new google.maps.LatLng(station.latitude, station.longitude));
                 const userLocation = new google.maps.LatLng(userLat, userLng);
 
                 const service = new google.maps.DistanceMatrixService();
                 const maxDestinations = 25;
                 const destinationChunks = [];
 
-                for (let i = 0; i < destinations.length; i += maxDestinations) {
-                    destinationChunks.push(destinations.slice(i, i + maxDestinations));
-                }
+                currentStations.forEach(station => {
+                    destinationChunks.push(new google.maps.LatLng(station.latitude, station.longitude));
+                });
 
                 const results = [];
 
                 function processChunks(chunkIndex) {
                     if (chunkIndex >= destinationChunks.length) {
                         // All chunks processed
-                        results.forEach((chunkResults, chunkIndex) => {
-                            chunkResults.forEach((element, index) => {
-                                const stationIndex = chunkIndex * maxDestinations + index;
-                                const station = stations[stationIndex];
-                                if (element.status === 'OK') {
-                                    station.distance = element.distance.value / 1000; // Convert to kilometers
-                                    station.duration = element.duration.value / 60; // Convert to minutes
-                                } else {
-                                    station.distance = 'N/A';
-                                    station.duration = 'N/A';
-                                }
-                            });
+                        results.forEach((element, index) => {
+                            const station = currentStations[index
+                            ];
+                            if (element.status === 'OK') {
+                                station.distance = element.distance.value / 1000; // Convert to kilometers
+                                station.duration = element.duration.value / 60; // Convert to minutes
+                            } else {
+                                station.distance = 'N/A';
+                                station.duration = 'N/A';
+                            }
                         });
-
-                        // Sort stations by duration (travel time)
-                        stations.sort((a, b) => a.duration - b.duration);
 
                         // Clear existing stations in the list
                         stationListDiv.innerHTML = '';
 
                         // Display sorted stations
-                        stations.forEach(station => {
+                        currentStations.forEach(station => {
                             const marker = new google.maps.Marker({
                                 position: { lat: station.latitude, lng: station.longitude },
                                 map: map,
@@ -277,20 +326,21 @@
                             });
 
                             marker.addListener("click", () => {
-                                showStreetView(station);
+                                showOrderPage(station);
                             });
 
                             const stationDiv = createStationElement(station);
                             stationListDiv.appendChild(stationDiv);
                         });
 
+                        document.getElementById('currentPage').textContent = `Page ${currentPage}`;
                         return;
                     }
 
                     service.getDistanceMatrix(
                         {
                             origins: [userLocation],
-                            destinations: destinationChunks[chunkIndex],
+                            destinations: [destinationChunks[chunkIndex]],
                             travelMode: 'DRIVING',
                             unitSystem: google.maps.UnitSystem.METRIC,
                         },
@@ -300,7 +350,7 @@
                                 return;
                             }
 
-                            results.push(response.rows[0].elements);
+                            results.push(response.rows[0].elements[0]);
                             processChunks(chunkIndex + 1);
                         }
                     );
@@ -320,30 +370,27 @@
                     <p>Distance: ${station.distance !== 'N/A' ? station.distance.toFixed(2) : 'N/A'} km</p>
                     <p>Travel Time: ${station.duration !== 'N/A' ? station.duration.toFixed(1) : 'N/A'} minutes</p>
                     <p>Ratings: ${station.ratings}</p>
-                    <p>Fuel Price (Latest): ${station.latestFuelPrice}</p>
-                    <p>Diesel Price (Latest): ${station.latestDieselPrice}</p>
                     <p>Availability: ${station.availability}</p>
-                    <button type="button">Buy</button>
                 `;
 
                 stationDiv.addEventListener('click', () => {
-                    showStreetView(station);
+                    showOrderPage(station);
                 });
 
                 return stationDiv;
             }
 
-            function showStreetView(station) {
-                const panorama = new google.maps.StreetViewPanorama(mapDiv, {
-                    position: { lat: station.latitude, lng: station.longitude },
-                    pov: {
-                        heading: 0,
-                        pitch: 0
-                    },
-                    zoom: 1
+            function showOrderPage(station) {
+                const queryParams = new URLSearchParams({
+                    name: station.name,
+                    address: station.address,
+                    fuelPrice: station.latestFuelPrice,
+                    dieselPrice: station.latestDieselPrice,
+                    availability: station.availability,
+                    img: station.img
                 });
 
-                map.setStreetView(panorama);
+                window.location.href = `./orderPage.html?${queryParams.toString()}`;
             }
 
             // Function to update navbar based on token presence
@@ -379,7 +426,6 @@
                 try {
                     // Decode the token to get the payload
                     const payload = JSON.parse(atob(token.split('.')[1]));
-                    console.log(payload.exp)
 
                     // Get the current time in seconds since epoch
                     const currentTime = Math.floor(Date.now() / 1000);
@@ -400,16 +446,32 @@
             // Call checkTokenAndRedirect function when the page is loaded
             document.addEventListener('DOMContentLoaded', () => {
                 checkTokenAndRedirect();
-                setInterval(checkTokenAndRedirect, 30000); // Check every 2 minutes
+                setInterval(checkTokenAndRedirect, 30000); // Check every 30 seconds
+            });
+
+            // Pagination button event listeners
+            document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayStations(currentPage);
+                }
+            });
+
+            document.getElementById('nextPage').addEventListener('click', () => {
+                const maxPage = Math.ceil(stations.length / stationsPerPage);
+                if (currentPage < maxPage) {
+                    currentPage++;
+                    displayStations(currentPage);
+                }
+            });
+
+            // Logout button event listener
+            const logOutButton = document.getElementById("logoutButton");
+            logOutButton.addEventListener("click", () => {
+                localStorage.removeItem("token");
+                window.location.href = "./login.html";
             });
         }
-    </script>
-    <script>
-        const logOutButton = document.getElementById("logoutButton")
-        logOutButton.addEventListener("click", () => {
-            localStorage.removeItem("token");
-            window.location.href = "./login.html";
-        })
     </script>
 </body>
 

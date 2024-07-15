@@ -73,6 +73,19 @@
       background-color: #ddd;
       color: black;
     }
+    #logoutButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#logoutButton:hover {
+    background-color: #c82333;
+}
   </style>
 </head>
 <body>
@@ -172,7 +185,7 @@
         const enteredBy = fuelPriceForm.enteredBy.value;
 
         try {
-          const response = await fetch("http://localhost:3000/Admin/addFuelPrice", {
+          const response = await fetch("http://localhost:3000/Admin/help", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

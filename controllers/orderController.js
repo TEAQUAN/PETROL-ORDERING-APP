@@ -2,38 +2,42 @@
 const Order = require('../models/Order');
 
 exports.placeOrder = async (req, res) => {
+  const { user, items, paymentReference } = req.body;
+
   try {
-    const { user, station, fuelType, quantity, totalPrice } = req.body;
+      // Prepare order items
+      const orderItems = items.map(item => ({
+          user: user,
+          station: item.station,
+          fuelType: item.fuelType,
+          quantity: item.quantity,
+          totalPrice: item.totalPrice,
+          paymentReference: paymentReference
+      }));
 
-    const newOrder = new Order({
-      user,
-      station,
-      fuelType,
-      quantity,
-      totalPrice,
-    });
+      // Save all order items to the database
+      await Order.insertMany(orderItems);
 
-    await newOrder.save();
-    res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+      // Respond with success message
+      res.json({ success: true, message: 'Order saved successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+      console.error('Error saving order:', error);
+      res.status(500).json({ success: false, message: 'Failed to save order' });
   }
 };
 
-exports.getOrderById = async (req, res) => {
+exports.getOrdersByUserId = async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId)
+
   try {
-    const { id } = req.params;
-    const order = await Order.findById(id);
+      // Fetch orders for userId from your database or data source
+      const orders = await Order.find({ user: userId });
 
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    res.json(order);
+      res.json(orders); // Respond with orders in JSON format
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+      console.error('Error fetching orders:', error.message);
+      res.status(500).json({ message: 'Server Error' });
   }
 };
 

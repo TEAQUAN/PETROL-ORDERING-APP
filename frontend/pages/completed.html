@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        #ordersList {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item p {
+            margin: 5px 0;
+        }
+
+        .order-item strong {
+            font-weight: bold;
+        }
+    </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="./stations.html">POA</a>
+        <a href="cart.html"><i class="fa fa-shopping-cart">Cart</i></a>
+        
+        
+    </div>
+    
+    <h1>Completed Orders</h1>
+
+    <div id="ordersList">
+        <!-- Orders will be displayed here -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert('Authorization token missing. Please log in again.');
+                return;
+            }
+
+            // Function to decode JWT
+            function decodeJWT(token) {
+                try {
+                    const parts = token.split('.');
+                    const decodedPayload = atob(parts[1]);
+                    const decodedObject = JSON.parse(decodedPayload);
+                    return decodedObject;
+                } catch (error) {
+                    console.error('Error decoding JWT:', error);
+                    return null;
+                }
+            }
+
+            // Decode the token to get the user object
+            const decoded = decodeJWT(token);
+
+            if (!decoded) {
+                alert('Failed to decode token. Please log in again.');
+                return;
+            }
+
+            const userId = decoded.userId;
+
+            fetch(`http://localhost:3000/orders/user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the JSON from the response
+            })
+            .then(data => {
+                console.log('Orders:', data); // Display the fetched data
+
+                // Update the DOM with fetched orders
+                const ordersList = document.getElementById('ordersList');
+
+                // Clear any existing content in the ordersList
+                ordersList.innerHTML = '';
+
+                // Loop through each order and create HTML elements to display them
+                data.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.classList.add('order-item');
+
+                    // Example structure to display order details
+                    orderElement.innerHTML = `
+                        <p><strong>Order ID:</strong> ${order._id}</p>
+                        <p><strong>Fuel Type:</strong> ${order.fuelType}</p>
+                        <p><strong>Quantity:</strong> ${order.quantity}</p>
+                        <p><strong>Station:</strong> ${order.station}</p>
+                        <p><strong>Total Price:</strong> ${order.totalPrice}</p>
+                    `;
+
+                    ordersList.appendChild(orderElement);
+                });
+
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                alert('Error fetching orders. Please try again later.');
+            });
+
+        });
+    </script>
+</body>
+</html>

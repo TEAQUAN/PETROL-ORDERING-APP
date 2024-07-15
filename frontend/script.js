@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const latitude = coords.latitude;
       const longitude = coords.longitude;
       console.log(latitude, longitude);
-      const radius = 5000; // Default radius (in meters)
+      const radius = 40000; // Default radius (in meters)
 
       // Show notification
       notification.textContent = 'Fetching petrol stations...';

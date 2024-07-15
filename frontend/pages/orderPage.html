@@ -1,203 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Place Order</title>
+    <title>Order Fuel</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9fafc;
             color: #333;
-            padding-top: 70px; /* Adjusted for navbar height */
+            padding: 20px;
+            margin: 0;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .order-details {
+            max-width: 600px;
             background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
-        .order-details h2 {
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
             margin-bottom: 10px;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 0 auto 20px;
         }
 
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
-        .form-group label {
+        label {
             display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .total-price {
+            font-size: 24px;
             font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .btn {
+        button {
             background-color: #007bff;
             color: #fff;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+            padding: 12px 24px;
+            font-size: 18px;
             border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: background-color 0.3s ease;
         }
 
-        .btn:hover {
+        button:hover {
             background-color: #0056b3;
         }
     </style>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <h1 class="logo"><a href="../Home.html" style="color: white; text-decoration: none;">POA</a></h1>
-            <div class="nav-links">
-                <button id="logoutButton">Logout</button>
-            </div>
-        </div>
-    </nav>
+    <div class="navbar">
+        <h1>Order Fuel</h1>
+        <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+        
+        
+    </div>
 
     <div class="container">
-        <div class="order-details">
-            <h2>Order Details</h2>
-            <p>You are placing an order at:</p>
-            <p id="stationDetails"></p>
-            <form id="orderForm">
-                <div class="form-group">
-                    <label for="name">Your Name:</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Your Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Your Phone:</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
-                <div class="form-group">
-                    <label for="fuelType">Fuel Type:</label>
-                    <select id="fuelType" name="fuelType" required>
-                        <option value="Petrol">Petrol</option>
-                        <option value="Diesel">Diesel</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="quantity">Quantity (in liters):</label>
-                    <input type="number" id="quantity" name="quantity" required>
-                </div>
-                <div class="form-group">
-                    <label for="additionalInfo">Additional Info:</label>
-                    <textarea id="additionalInfo" name="additionalInfo" rows="4"></textarea>
-                </div>
-                <button type="submit" class="btn">Place Order</button>
-            </form>
+        <img id="stationImage" src="" alt="Station Image">
+        <p id="stationName"></p>
+        <p id="stationAddress"></p>
+        <p id="fuelPrice">Price of fuel: 100 NGN</p>
+        <p id="dieselPrice">Price of diesel: 120 NGN</p>
+        <div class="form-group">
+            <label for="fuelType">Select Fuel Type:</label>
+            <select id="fuelType">
+                <option value="fuel">Fuel</option>
+                <option value="diesel">Diesel</option>
+            </select>
         </div>
+        <div id="fuelQuantity" class="form-group">
+            <label for="quantityFuel">Enter Quantity (Fuel):</label>
+            <input type="number" id="quantityFuel" min="0" value="0">
+        </div>
+        <div id="dieselQuantity" class="form-group" style="display: none;">
+            <label for="quantityDiesel">Enter Quantity (Diesel):</label>
+            <input type="number" id="quantityDiesel" min="0" value="0">
+        </div>
+        <div class="total-price">
+            Total Price: <span id="totalPrice">0</span> NGN
+        </div>
+        <button id="addToCartButton" onclick="addToCart()">Add to Cart</button>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const stationDetails = document.getElementById('stationDetails');
-            const orderForm = document.getElementById('orderForm');
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            const address = urlParams.get('address');
+            const fuelPrice = parseFloat(urlParams.get('fuelPrice'));
+            const dieselPrice = parseFloat(urlParams.get('dieselPrice'));
+            const image = urlParams.get('img');
 
-            // Retrieve selected station from localStorage
-            const selectedStation = JSON.parse(localStorage.getItem('selectedStation'));
-            if (!selectedStation) {
-                // If no station is selected, redirect to the main page
-                window.location.href = './index.html';
-            }
+            document.getElementById('stationName').textContent = `Station: ${name}`;
+            document.getElementById('stationAddress').textContent = `Address: ${address}`;
+            document.getElementById('fuelPrice').textContent = `Price of fuel: ${fuelPrice} NGN`;
+            document.getElementById('dieselPrice').textContent = `Price of diesel: ${dieselPrice} NGN`;
+            document.getElementById('stationImage').src = `http://localhost:3000/${image.replace(/\\/g, '/')}`;
 
-            // Display selected station details
-            stationDetails.innerHTML = `
-                <strong>${selectedStation.name}</strong><br>
-                Address: ${selectedStation.address}<br>
-                Fuel Price: ${selectedStation.latestFuelPrice}<br>
-                Diesel Price: ${selectedStation.latestDieselPrice}
-            `;
+            const fuelTypeSelect = document.getElementById('fuelType');
+            const fuelQuantity = document.getElementById('fuelQuantity');
+            const dieselQuantity = document.getElementById('dieselQuantity');
+            const quantityFuelInput = document.getElementById('quantityFuel');
+            const quantityDieselInput = document.getElementById('quantityDiesel');
+            const totalPriceSpan = document.getElementById('totalPrice');
 
-            // Handle form submission
-            orderForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const formData = new FormData(orderForm);
-                const orderDetails = {
-                    stationId: selectedStation._id,
-                    name: formData.get('name'),
-                    email: formData.get('email'),
-                    phone: formData.get('phone'),
-                    fuelType: formData.get('fuelType'),
-                    quantity: formData.get('quantity'),
-                    additionalInfo: formData.get('additionalInfo'),
-                };
-
-                try {
-                    const token = localStorage.getItem('token');
-                    const response = await fetch('http://localhost:3000/orders/placeOrder', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'authorization': `Bearer ${token}`,
-                        },
-                        body: JSON.stringify(orderDetails),
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to place order');
-                    }
-
-                    const data = await response.json();
-                    console.log('Order placed successfully:', data);
-                    alert('Order placed successfully!');
-                    window.location.href = './index.html'; // Redirect to main page
-                } catch (error) {
-                    console.error('Error placing order:', error);
-                    alert('Failed to place order. Please try again later.');
+            function updateTotalPrice() {
+                if (fuelTypeSelect.value === 'fuel') {
+                    fuelQuantity.style.display = 'block';
+                    dieselQuantity.style.display = 'none';
+                    const totalPrice = parseFloat(quantityFuelInput.value) * fuelPrice;
+                    totalPriceSpan.textContent = totalPrice.toFixed(2);
+                } else if (fuelTypeSelect.value === 'diesel') {
+                    fuelQuantity.style.display = 'none';
+                    dieselQuantity.style.display = 'block';
+                    const totalPrice = parseFloat(quantityDieselInput.value) * dieselPrice;
+                    totalPriceSpan.textContent = totalPrice.toFixed(2);
                 }
-            });
-
-            // Function to update navbar based on token presence
-            function updateNavbar() {
-                const token = localStorage.getItem('token');
             }
 
-            // Function to initialize the page
-            function initPage() {
-                // Update navbar on page load
-                updateNavbar();
-            }
+            fuelTypeSelect.addEventListener('change', updateTotalPrice);
+            quantityFuelInput.addEventListener('input', updateTotalPrice);
+            quantityDieselInput.addEventListener('input', updateTotalPrice);
 
-            // Call initPage function when the page is loaded
-            initPage();
-
-            const logOutButton = document.getElementById("logoutButton");
-            logOutButton.addEventListener("click", () => {
-                localStorage.removeItem("token");
-                window.location.href = "./login.html";
-            });
+            updateTotalPrice(); // Initial call to set the price based on default values
         });
+
+        function addToCart() {
+            const fuelTypeSelect = document.getElementById('fuelType').value;
+            let quantity;
+            let totalPrice;
+
+            if (fuelTypeSelect === 'fuel') {
+                quantity = parseFloat(document.getElementById('quantityFuel').value);
+                totalPrice = quantity * parseFloat(document.getElementById('fuelPrice').textContent.split(': ')[1]);
+            } else if (fuelTypeSelect === 'diesel') {
+                quantity = parseFloat(document.getElementById('quantityDiesel').value);
+                totalPrice = quantity * parseFloat(document.getElementById('dieselPrice').textContent.split(': ')[1]);
+            }
+
+            const stationName = document.getElementById('stationName').textContent.replace('Station: ', '');
+            const stationAddress = document.getElementById('stationAddress').textContent.replace('Address: ', '');
+
+            // Store in localStorage or send to backend for storage in database
+            const cartItem = {
+                station: stationName,
+                address: stationAddress,
+                fuelType: fuelTypeSelect,
+                quantity: quantity,
+                totalPrice: totalPrice  // Include totalPrice in the cart item
+            };
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push(cartItem);
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            alert('Item added to cart!');
+            // Optionally redirect or perform other actions after adding to cart
+        }
     </script>
+
 </body>
+
 </html>

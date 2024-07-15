@@ -130,7 +130,7 @@ exports.fetchAndSaveStations = async (req, res) => {
       return res.status(400).json({ error: 'Latitude and longitude must be valid numbers.' });
     }
 
-    const radius = 3000 ; // Default radius (in meters)
+    const radius = 40000 ; // Default radius (in meters)
     const apiKey = process.env.API_KEY;
 
 

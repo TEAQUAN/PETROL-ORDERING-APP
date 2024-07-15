@@ -48,7 +48,7 @@
       margin-bottom: 5px;
     }
 
-    input, select, button {
+    input, button {
       margin-bottom: 10px;
       padding: 8px;
       border-radius: 5px;
@@ -76,18 +76,16 @@
 <body>
   <!-- Navbar -->
   <div class="navbar">
-    <a href="AdminPage.html">Admin Home page</a> <!-- Add your home page link -->
-    <a href="uploadImage.html">Upload Image</a> <!-- Link to the image upload page -->
+    <a href="AdminPage.html">Admin Home page</a>
+    <a href="uploadImage.html">Upload Image</a>
   </div>
 
   <!-- Main content -->
   <div class="container">
     <h2>Upload Image</h2>
     <form id="imageUploadForm" enctype="multipart/form-data">
-      <label for="petrolStationName">Petrol Station:</label>
-      <select id="petrolStationName" name="petrolStationName" required>
-        <option value="">Select a petrol station</option>
-      </select>
+      <label for="petrolStationName">Petrol Station Name:</label>
+      <input type="text" id="petrolStationName" name="petrolStationName" required>
       <label for="image">Choose Image:</label>
       <input type="file" id="image" name="image" accept="image/*" required>
       <button type="submit">Upload Image</button>
@@ -96,64 +94,66 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const imageUploadForm = document.getElementById('imageUploadForm');
       const message = document.getElementById('message');
-      const petrolStationDropdown = document.getElementById('petrolStationName');
-
-      // Fetch petrol stations and populate the dropdown
-      try {
-        const response = await fetch("http://localhost:3000/GetStations/allStations", {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'authorization': 'Bearer ' + localStorage.getItem('token') // Include the Bearer token
-          }
-        });
-
-        if (!response.ok) throw new Error('Failed to fetch petrol stations');
-
-        const petrolStations = await response.json();
-        petrolStations.forEach(station => {
-          const option = document.createElement('option');
-          option.value = station._id; // Use station ID as value
-          option.textContent = station.name + " " + station.formattedAddress;
-          petrolStationDropdown.appendChild(option);
-        });
-      } catch (error) {
-        console.error('Error fetching petrol stations:', error);
-      }
 
       imageUploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append('petrolStationName', petrolStationDropdown.value);
-        formData.append('image', document.getElementById('image').files[0]);
+        const imageInput = document.getElementById('image');
+        const file = imageInput.files[0];
 
-        try {
-          const response = await fetch("http://localhost:3000/Admin/addImg", {
-            method: 'POST',
-            headers: {
-              'authorization': 'Bearer ' + localStorage.getItem('token')
-            },
-            body: formData
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            message.textContent = data.message;
-            message.style.color = 'green';
-            imageUploadForm.reset();
-          } else {
-            throw new Error(data.error);
-          }
-        } catch (error) {
-          console.error('Error uploading image:', error);
-          message.textContent = 'Error uploading image';
+        // Validate file size (e.g., max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+          message.textContent = 'Error: Image size exceeds 5MB.';
           message.style.color = 'red';
+          return;
         }
+
+        // Validate image dimensions
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = async () => {
+          const maxWidth = 1024; // 1024px
+          const maxHeight = 768; // 768px
+
+          if (img.width > maxWidth || img.height > maxHeight) {
+            message.textContent = 'Error: Image dimensions exceed allowed size.';
+            message.style.color = 'red';
+            return;
+          }
+
+          // If validations pass, submit the form
+          const formData = new FormData();
+          formData.append('petrolStationName', document.getElementById('petrolStationName').value);
+          formData.append('image', file);
+
+          try {
+            const response = await fetch("http://localhost:3000/Admin/addImg", {
+              method: 'POST',
+              headers: {
+                'authorization': 'Bearer ' + localStorage.getItem('token')
+              },
+              body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              message.textContent = data.message;
+              message.style.color = 'green';
+              imageUploadForm.reset();
+            } else {
+              throw new Error(data.error);
+            }
+          } catch (error) {
+            console.error('Error uploading image:', error);
+            message.textContent = 'Error uploading image';
+            message.style.color = 'red';
+          }
+        };
       });
     });
   </script>

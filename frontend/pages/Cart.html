@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Order Fuel</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9fafc;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .cart-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .cart-item img {
+            max-width: 100px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .cart-item-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-quantity {
+            font-weight: bold;
+        }
+
+        .item-price {
+            font-weight: bold;
+        }
+
+        .total-price {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .checkout-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            background-color: #0056b3;
+        }
+        .navbar {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+    </style>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="./login.html">POA</a>
+        <a href="./completed.html"><i  class="fa fa-shopping-bag">Completed</i></a>
+        
+    </div>
+
+    <div class="container">
+        <h1>Cart</h1>
+
+        <div id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+
+        <div class="total-price" id="totalPrice">
+            Total: <span id="totalAmount">0</span> NGN
+        </div>
+
+        <button class="checkout-btn" onclick="checkout()">Checkout with Paystack</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            const cartItemsDiv = document.getElementById('cartItems');
+            let totalAmount = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = parseFloat(item.totalPrice).toFixed(2);
+                totalAmount += parseFloat(item.totalPrice);
+
+                const cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+
+                const itemDetails = document.createElement('div');
+                itemDetails.classList.add('cart-item-details');
+
+                const itemInfo = document.createElement('div');
+                itemInfo.classList.add('item-info');
+
+                const itemName = document.createElement('h3');
+                itemName.textContent = `${item.fuelType} - ${item.station}`;
+
+                const itemQuantity = document.createElement('p');
+                itemQuantity.classList.add('item-quantity');
+                itemQuantity.textContent = `Quantity: ${item.quantity}`;
+
+                const itemPrice = document.createElement('p');
+                itemPrice.classList.add('item-price');
+                itemPrice.textContent = `Price: ${itemTotal} NGN`;
+
+                itemInfo.appendChild(itemName);
+                itemInfo.appendChild(itemQuantity);
+                itemInfo.appendChild(itemPrice);
+
+                itemDetails.appendChild(itemInfo);
+
+                cartItem.appendChild(itemDetails);
+
+                cartItemsDiv.appendChild(cartItem);
+            });
+
+            const totalAmountSpan = document.getElementById('totalAmount');
+            totalAmountSpan.textContent = totalAmount.toFixed(2);
+        });
+
+        function checkout() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            if (cart.length === 0) {
+                alert('Your cart is empty. Please add items before proceeding to checkout.');
+                return;
+            }
+
+            let totalAmount = cart.reduce((acc, item) => acc + parseFloat(item.totalPrice), 0);
+
+            // Convert totalAmount to kobo (Paystack requires amount in kobo)
+            totalAmount *= 100;
+
+            const itemsMetadata = cart.map(item => ({
+                display_name: `${item.fuelType} - ${item.station}`,
+                variable_name: `${item.fuelType}_${item.station}`,
+                value: `${item.quantity} @ ${parseFloat(item.totalPrice / item.quantity).toFixed(2)} NGN each`
+            }));
+
+            const paystackHandler = PaystackPop.setup({
+                key: 'pk_test_3595f1ece6a2b4642e86ac013036d513005f29db', // Replace with your Paystack public key
+                email: 'Tobiadekunle73@outlook.com', // Replace with customer's email
+                amount: totalAmount, // Paystack uses amount in kobo (multiply by 100 for Naira)
+                currency: 'NGN', // Currency
+                ref: '' + Math.floor((Math.random() * 1000000000) + 1), // Generate a unique reference number dynamically
+                metadata: {
+                    custom_fields: itemsMetadata
+                },
+                callback: function (response) {
+                    alert('Payment complete! Reference: ' + response.reference);
+                    // You can handle the payment success here
+                    console.log(response.reference);
+                 //   console.log(localStorage.getItem('cart'))
+                    // Save order to the database
+                    saveOrder(response.reference);
+                
+                },
+                onClose: function () {
+                    alert('Payment cancelled by user.');
+                }
+            });
+
+            paystackHandler.openIframe();
+        }
+        
+        function saveOrder(paymentReference) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+    
+    if (!token) {
+        alert('Authorization token missing. Please log in again.');
+        return;
+    }
+    
+    // Function to decode JWT
+    function decodeJWT(token) {
+        try {
+            const parts = token.split('.');
+            const decodedPayload = atob(parts[1]);
+            const decodedObject = JSON.parse(decodedPayload);
+            return decodedObject;
+        } catch (error) {
+            console.error('Error decoding JWT:', error);
+            return null;
+        }
+    }
+    
+    // Decode the token to get the user object
+    const decoded = decodeJWT(token);
+    
+    if (!decoded) {
+        alert('Failed to decode token. Please log in again.');
+        return;
+    }
+
+    console.log("<< decoded - user >>", decoded);
+    const userId = decoded.userId;
+    
+    // Prepare order items
+    const orderItems = cart.map(item => ({
+        user: userId,               // Assign userId here
+        station: item.station,      
+        fuelType: item.fuelType,    
+        quantity: item.quantity,    
+        totalPrice: item.totalPrice 
+    }));
+
+    console.log('this is what is being sent to the backend ' + orderItems);
+
+    // Send order to backend
+    fetch('http://localhost:3000/orders/orderd', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            user: userId,
+            items: orderItems,
+            paymentReference: paymentReference
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Order saved successfully');
+            localStorage.removeItem('cart'); // Clear cart after successful order
+            window.location.href = '../pages/stations.html'; 
+        } else {
+            alert('Error saving order: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving order:', error);
+        alert('Error saving order. Please try again later.');
+    });
+}
+
+
+    </script>
+
+</body>
+
+</html>
